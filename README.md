@@ -1,4 +1,4 @@
-# Client Trojan in C (Educational Project)
+# Client keylogger C2 in C (Educational Project)
 
 ## Introduction
 
