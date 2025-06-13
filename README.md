@@ -1,30 +1,46 @@
-# Client keylogger C2 in C (Educational Project)
+Client-Server Keylogger C2 in C (Educational Project)
+🧠 Introduction
 
-## Introduction
+This project is an educational exercise designed to reinforce C programming skills, with a focus on system-level development, socket programming, and multithreading. It implements a simple Command & Control (C2) architecture where:
 
-This project is an educational exercise aimed at improving C programming skills, focusing on networking, system programming, and multithreading. It demonstrates how to structure a client-side program that interacts with a Command & Control (C2) server. The project follows best practices in modularization, threading, and daemonization.
+    A client daemon acts as a keylogger and command executor.
 
-**Disclaimer:** This project is strictly for learning purposes. Unauthorized use of such techniques for malicious activities is illegal.
+    A server collects keystrokes and sends shell commands to the client.
 
-## Features
+    ⚠️ Disclaimer: This project is strictly for educational and ethical purposes. Unauthorized deployment of such techniques is illegal.
 
-- **Daemonization:** Runs in the background without a terminal.
-- **Keylogger:** Captures keyboard events and sends them in buffered packets to the C2 server.
-- **Command Execution:** Receives commands from the C2 server and executes system commands.
-- **Multithreading:** Uses threads to handle both keylogging and command reception simultaneously.
-- **Network Communication:** Establishes a TCP connection with a remote server.
+ Features
+Client
 
-## Project Structure
+    🖥️ Daemonization – Detaches from terminal and runs in the background.
 
-```
+    ⌨️ Keylogger – Captures keystrokes from /dev/input/event0 and sends them to the server.
+
+    🧠 Command Listener – Receives commands from the server and executes them on the client system.
+
+    🧵 Multithreading – Separates keylogging and command-handling in concurrent threads.
+
+    🌐 TCP Communication – Maintains a persistent connection to the remote server.
+
+Server
+
+    📥 Keystroke Logging – Receives and writes keystrokes to a local file (keylogger.txt).
+
+    💬 Command Sender – Sends shell commands to the client and displays the execution result.
+
+    ⚙️ Multiclient Support (WIP) – Can be extended to handle multiple clients via threading.
+
+🗂️ Project Structure
+Client
+
 client/
 │── src/
 │   ├── main.c          # Initializes the daemon and starts threads
 │   ├── demon.c         # Converts the process into a daemon
 │   ├── keylogger.c     # Captures and sends keystrokes
 │   ├── c2_listener.c   # Listens for commands from the server
-│   ├── commands.c      # Handles command execution (e.g., whoami)
-│   ├── network.c       # Manages the TCP connection
+│   ├── commands.c      # Executes commands and sends results
+│   ├── network.c       # TCP connection management
 │── include/
 │   ├── demon.h
 │   ├── keylogger.h
@@ -32,52 +48,90 @@ client/
 │   ├── commands.h
 │   ├── network.h
 │── Makefile
-│── README.md          # This documentation file
-```
 
-## Installation
+Server
 
-### Prerequisites
+server/
+│── src/
+│   ├── main.c          # Accepts client connections
+│   ├── server.c        # Handles incoming client data and command processing
+│   ├── log.c           # Writes keystrokes to a file and prints command results
+│── include/
+│   ├── server.h
+│   ├── log.h
+│── Makefile
+│── keylogger.txt       # Keystrokes log (auto-created)
 
-- Linux OS
-- GCC compiler
-- Root privileges (for keylogger access to `/dev/input/event0`)
+⚙️ Installation
+Requirements
 
-### Compilation
+    Linux-based OS
 
-Run the following command in the root directory:
+    GCC compiler
 
-```sh
+    Root privileges (for client to access /dev/input/event0)
+
+    Open port (default 8080)
+
+Build
+
+# Build the client
+cd client
 make
-```
 
-This will generate an executable named `client`.
+# Build the server
+cd ../server
+make
 
-## Usage
+Usage
+1. Start the Server
 
-Once compiled, execute the binary as follows:
+./server
 
-```sh
+It will listen on port 8080 and write logs to keylogger.txt.
+2. Start the Client (as root)
+
 ./client
-```
 
-Since it runs as a daemon, it will detach from the terminal.
-To check if it's running, use:
+The client runs in the background and begins:
 
-```sh
-ps aux | grep client
-```
+    Sending keystrokes
 
-## Learning Goals
+    Listening for commands
 
-- Understanding process management in Linux (fork, setsid, umask).
-- Implementing multithreading with `pthread`.
-- Using raw input event handling for keylogging.
-- Managing socket programming for remote command execution.
+3. Interacting with the Client
 
-This project is a work in progress and serves as a practical exercise in C programming.
+On the server console, you can enter shell commands (e.g., whoami, ls, uname -a).
+The output will be sent back by the client and displayed on the server terminal.
+ Communication Flow
 
-## Disclaimer
+CLIENT                            SERVER
+-------                          --------
+| keylogger thread | ——— keystrokes ———> | log to file |
+|                  |                      |
+| command thread   | <—— commands ————   | stdin input |
+|     exec result  | ——— result ————> | print output |
 
-This project is solely for educational purposes. Any misuse of this code is strictly prohibited. Always ensure that ethical guidelines and legal considerations are followed when dealing with system programming and security-related topics.
+All communication occurs via a single TCP socket connection using a simple protocol:
 
+    Commands and keystrokes are sent as char buffers.
+
+    Server distinguishes between log data and command results.
+
+ Learning Objectives
+
+    Daemon and process control (fork, setsid, umask)
+
+    Multithreaded C programming with pthread
+
+    Low-level keyboard event reading (/dev/input/eventX)
+
+    TCP sockets: connect, bind, listen, accept
+
+    Modular C architecture: .c/.h separation and Makefiles
+
+❗ Legal Disclaimer
+
+This project is strictly for educational use only.
+Do not deploy, distribute, or use this code on any device or network without explicit consent.
+Improper use may lead to criminal charges.
