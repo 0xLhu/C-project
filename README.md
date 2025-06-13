@@ -34,33 +34,58 @@ Server
 Client
 
 client/
+
 │── src/
+
 │   ├── main.c          # Initializes the daemon and starts threads
+
 │   ├── demon.c         # Converts the process into a daemon
+
 │   ├── keylogger.c     # Captures and sends keystrokes
+
 │   ├── c2_listener.c   # Listens for commands from the server
+
 │   ├── commands.c      # Executes commands and sends results
+
 │   ├── network.c       # TCP connection management
+
 │── include/
+
 │   ├── demon.h
+
 │   ├── keylogger.h
+
 │   ├── c2_listener.h
+
 │   ├── commands.h
+
 │   ├── network.h
+
 │── Makefile
+
 
 Server
 
 server/
+
 │── src/
+
 │   ├── main.c          # Accepts client connections
+
 │   ├── server.c        # Handles incoming client data and command processing
+
 │   ├── log.c           # Writes keystrokes to a file and prints command results
+
 │── include/
+
 │   ├── server.h
+
 │   ├── log.h
+
 │── Makefile
+
 │── keylogger.txt       # Keystrokes log (auto-created)
+
 
 ⚙️ Installation
 Requirements
